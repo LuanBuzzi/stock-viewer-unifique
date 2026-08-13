@@ -1,6 +1,6 @@
 // Configuração do Supabase
 // Substitua pelas suas credenciais corretas!
-const SUPABASE_URL = 'https://nhualbztrfoxbpugwbes.supabase.co';
+const SUPABASE_URL = 'https://nhualbztrfoxbpugwbes.supabase.co/rest/v1/';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5odWFsYnp0cmZveGJwdWd3YmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzMwNTEsImV4cCI6MjEwMjE0OTA1MX0.3dAkf-A9aDWrc8WDmjUp67EZoJCGBEHy3slAM44kI9c';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

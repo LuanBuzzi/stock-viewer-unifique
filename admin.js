@@ -8,9 +8,10 @@ function renderAdmin(container) {
                     <h1 style="font-size: 2rem; font-weight: 700;">Gestão de Pedidos (Estoque)</h1>
                     <p style="color: var(--text-secondary); margin-top: 8px;">Adicione novos pedidos e avance o status para aparecer na TV da Unifique.</p>
                 </div>
-                <div style="display: flex; gap: 16px;">
+                <div style="display: flex; gap: 16px; align-items: center;">
                     <a href="#tv" target="_blank" class="btn btn-outline" style="text-decoration: none;">Ver Tela da TV</a>
                     <button class="btn" id="btn-add">Novo Pedido</button>
+                    <button class="btn btn-outline" id="btn-logout" style="border-color: var(--danger); color: var(--danger);">Sair</button>
                 </div>
             </div>
 
@@ -57,6 +58,11 @@ function renderAdmin(container) {
     const formContainer = document.getElementById('form-container');
     const form = document.getElementById('order-form');
     
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        sessionStorage.removeItem('isAdminLoggedIn');
+        window.location.reload();
+    });
+
     document.getElementById('btn-add').addEventListener('click', () => {
         form.reset();
         formContainer.style.display = 'block';

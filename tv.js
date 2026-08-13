@@ -6,10 +6,13 @@ function renderTV(container) {
             <div class="tv-header">
                 <div class="unifique-logo-text">
                     <!-- Ícone Placeholder para a Logo -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <svg xmlns="https://i.ibb.co/99gZK6jz/image.png" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     UNIFIQUE | Retirada de Materiais
                 </div>
-                <div class="tv-clock" id="tv-clock">00:00</div>
+                <div style="display: flex; gap: 24px; align-items: center;">
+                    <div class="tv-clock" id="tv-clock">00:00</div>
+                    <a href="#admin" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: white; text-decoration: none;">Acesso Restrito</a>
+                </div>
             </div>
             
             <div class="kanban-board">

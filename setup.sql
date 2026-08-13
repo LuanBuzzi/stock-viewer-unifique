@@ -28,6 +28,13 @@ CREATE POLICY "Permitir remoção pública" ON orders
 -- 4. Ativar Replica Identity para o Real-time enviar toda a linha alterada
 ALTER TABLE orders REPLICA IDENTITY FULL;
 
+-- Adicionar a tabela à publicação do supabase_realtime
+BEGIN;
+  DROP PUBLICATION IF EXISTS supabase_realtime;
+  CREATE PUBLICATION supabase_realtime;
+COMMIT;
+ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+
 -- 5. Inserir dados de exemplo para testar a TV
 INSERT INTO orders (employee, description, status) VALUES 
   ('Luan Fernandes', '2x Roteador Wi-Fi 6', 'pedido'),
