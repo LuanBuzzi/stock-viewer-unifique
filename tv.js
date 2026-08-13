@@ -6,7 +6,7 @@ function renderTV(container) {
             <div class="tv-header">
                 <div class="unifique-logo-text">
                     <!-- Logo da Unifique -->
-                    <img src="https://i.ibb.co/99gZK6jz/image.png" alt="Unifique Logo" width="40" height="40" style="object-fit: contain; border-radius: 4px;">
+                    <img src="https://i.ibb.co/99gZK6jz/image.png" alt="Unifique Logo" width="120" height="120" style="object-fit: contain; border-radius: 4px;">
                     UNIFIQUE | Retirada de Materiais
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
