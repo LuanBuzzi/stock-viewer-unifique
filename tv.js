@@ -38,11 +38,16 @@ function renderTV(container) {
     `;
 
     // Relógio
+    let intervalId = null;
     const updateClock = () => {
-        const now = new Date();
-        document.getElementById('tv-clock').innerText = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const clock = document.getElementById('tv-clock');
+        if (clock) {
+            clock.innerText = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            if (intervalId) clearInterval(intervalId);
+        }
     };
-    setInterval(updateClock, 1000);
+    intervalId = setInterval(updateClock, 1000);
     updateClock();
 
     // Renderizar Cards

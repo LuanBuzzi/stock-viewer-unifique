@@ -1,9 +1,11 @@
 // Configuração do Supabase
 // Substitua pelas suas credenciais corretas!
-const SUPABASE_URL = 'https://nhualbztrfoxbpugwbes.supabase.co/rest/v1/';
+const SUPABASE_URL = 'https://nhualbztrfoxbpugwbes.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5odWFsYnp0cmZveGJwdWd3YmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzMwNTEsImV4cCI6MjEwMjE0OTA1MX0.3dAkf-A9aDWrc8WDmjUp67EZoJCGBEHy3slAM44kI9c';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false }
+});
 
 class OrderDB {
     constructor() {
@@ -18,13 +20,14 @@ class OrderDB {
     }
 
     async fetchOrders() {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('orders')
             .select('*')
             .order('created_at', { ascending: false }); // Pedidos mais novos no topo
 
         if (error) {
             console.error('Erro ao buscar pedidos:', error);
+            alert('Erro de conexão: ' + error.message);
             return;
         }
 
@@ -33,7 +36,7 @@ class OrderDB {
     }
 
     setupRealtimeSubscription() {
-        supabase
+        supabaseClient
             .channel('public:orders')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
                 console.log('Mudança no Pedido!', payload);
@@ -69,18 +72,27 @@ class OrderDB {
     }
 
     async addOrder(order) {
-        const { error } = await supabase.from('orders').insert([order]);
-        if (error) console.error('Erro ao adicionar pedido:', error);
+        const { error } = await supabaseClient.from('orders').insert([order]);
+        if (error) {
+            console.error('Erro ao adicionar pedido:', error);
+            alert('Erro ao adicionar: ' + error.message);
+        }
     }
 
     async updateStatus(id, newStatus) {
-        const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
-        if (error) console.error('Erro ao atualizar status:', error);
+        const { error } = await supabaseClient.from('orders').update({ status: newStatus }).eq('id', id);
+        if (error) {
+            console.error('Erro ao atualizar status:', error);
+            alert('Erro ao atualizar: ' + error.message);
+        }
     }
 
     async deleteOrder(id) {
-        const { error } = await supabase.from('orders').delete().eq('id', id);
-        if (error) console.error('Erro ao deletar pedido:', error);
+        const { error } = await supabaseClient.from('orders').delete().eq('id', id);
+        if (error) {
+            console.error('Erro ao deletar pedido:', error);
+            alert('Erro ao deletar: ' + error.message);
+        }
     }
 }
 
