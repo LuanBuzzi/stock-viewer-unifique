@@ -120,6 +120,7 @@ body::before {
     border-radius: 20px;
     border: 1px solid var(--card-border);
     padding: 24px;
+    overflow: hidden;
 }
 
 .kanban-header {
@@ -139,6 +140,7 @@ body::before {
 .kanban-cards {
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: 16px;
     overflow-y: auto;
     padding-right: 8px; /* For scrollbar */

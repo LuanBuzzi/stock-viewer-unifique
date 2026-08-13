@@ -10,6 +10,10 @@ function renderTV(container) {
                     UNIFIQUE | Retirada de Materiais
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
+                    <div class="tv-weather" id="tv-weather" style="font-size: 1.6rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
+                        <span id="weather-icon">--</span>
+                        <span id="weather-temp">--°C</span>
+                    </div>
                     <div class="tv-clock" id="tv-clock">00:00</div>
                     <a href="#admin" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: white; text-decoration: none;">Acesso Restrito</a>
                 </div>
@@ -49,6 +53,39 @@ function renderTV(container) {
     };
     intervalId = setInterval(updateClock, 1000);
     updateClock();
+
+    // Clima em Rio do Sul - SC
+    const fetchWeather = async () => {
+        try {
+            // Latitude -27.214, Longitude -49.643 (Rio do Sul)
+            const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-27.214&longitude=-49.643&current=temperature_2m,weather_code");
+            const data = await res.json();
+            const temp = Math.round(data.current.temperature_2m);
+            const code = data.current.weather_code;
+            
+            // Dicionário simples de códigos WMO para emojis
+            let icon = "☀️";
+            if (code === 0) icon = "☀️";
+            else if (code === 1 || code === 2 || code === 3) icon = "⛅";
+            else if (code === 45 || code === 48) icon = "🌫️";
+            else if (code >= 51 && code <= 67) icon = "🌧️";
+            else if (code >= 71 && code <= 77) icon = "❄️";
+            else if (code >= 80 && code <= 82) icon = "🌦️";
+            else if (code >= 95) icon = "⛈️";
+            
+            const tempEl = document.getElementById('weather-temp');
+            const iconEl = document.getElementById('weather-icon');
+            if (tempEl && iconEl) {
+                tempEl.innerText = `${temp}°C`;
+                iconEl.innerText = icon;
+                iconEl.title = "Clima em Rio do Sul";
+            }
+        } catch (error) {
+            console.error("Erro ao buscar o clima:", error);
+        }
+    };
+    fetchWeather();
+    let weatherInterval = setInterval(fetchWeather, 30 * 60 * 1000); // Atualiza a cada 30 min
 
     // Renderizar Cards
     const renderCard = (order) => {
@@ -110,5 +147,6 @@ function renderTV(container) {
         if (unsubscribe) unsubscribe();
         if (intervalId) clearInterval(intervalId);
         if (autoScrollInterval) clearInterval(autoScrollInterval);
+        if (weatherInterval) clearInterval(weatherInterval);
     };
 }
