@@ -1,42 +1,42 @@
 // Configuração do Supabase
 // Substitua pelas suas credenciais corretas!
-const SUPABASE_URL = 'COLE_AQUI_A_SUA_PROJECT_URL';
-const SUPABASE_ANON_KEY = 'COLE_AQUI_A_SUA_ANON_KEY';
+const SUPABASE_URL = 'https://nhualbztrfoxbpugwbes.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5odWFsYnp0cmZveGJwdWd3YmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzMwNTEsImV4cCI6MjEwMjE0OTA1MX0.3dAkf-A9aDWrc8WDmjUp67EZoJCGBEHy3slAM44kI9c';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-class RealTimeDB {
+class OrderDB {
     constructor() {
         this.listeners = [];
-        this.items = [];
+        this.orders = [];
         
         // Carrega dados iniciais
-        this.fetchItems();
+        this.fetchOrders();
 
         // Inscreve-se nas mudanças em tempo real
         this.setupRealtimeSubscription();
     }
 
-    async fetchItems() {
+    async fetchOrders() {
         const { data, error } = await supabase
-            .from('inventory')
+            .from('orders')
             .select('*')
-            .order('name', { ascending: true });
+            .order('created_at', { ascending: false }); // Pedidos mais novos no topo
 
         if (error) {
-            console.error('Erro ao buscar dados:', error);
+            console.error('Erro ao buscar pedidos:', error);
             return;
         }
 
-        this.items = data || [];
+        this.orders = data || [];
         this.notify();
     }
 
     setupRealtimeSubscription() {
         supabase
-            .channel('public:inventory')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, payload => {
-                console.log('Mudança Real-time recebida!', payload);
+            .channel('public:orders')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+                console.log('Mudança no Pedido!', payload);
                 this.handleRealtimePayload(payload);
             })
             .subscribe();
@@ -44,50 +44,48 @@ class RealTimeDB {
 
     handleRealtimePayload(payload) {
         if (payload.eventType === 'INSERT') {
-            this.items.push(payload.new);
+            this.orders.unshift(payload.new); // Adiciona no começo
         } else if (payload.eventType === 'UPDATE') {
-            this.items = this.items.map(item => item.id === payload.new.id ? payload.new : item);
+            this.orders = this.orders.map(o => o.id === payload.new.id ? payload.new : o);
         } else if (payload.eventType === 'DELETE') {
-            this.items = this.items.filter(item => item.id !== payload.old.id);
+            this.orders = this.orders.filter(o => o.id !== payload.old.id);
         }
         
-        // Reordenar por nome
-        this.items.sort((a, b) => a.name.localeCompare(b.name));
+        // Mantém a ordem por data
+        this.orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         this.notify();
     }
 
     subscribe(callback) {
         this.listeners.push(callback);
-        callback(this.items); // chamada inicial
+        callback(this.orders); // chamada inicial
         return () => {
             this.listeners = this.listeners.filter(l => l !== callback);
         };
     }
 
     notify() {
-        this.listeners.forEach(cb => cb(this.items));
+        this.listeners.forEach(cb => cb(this.orders));
     }
 
-    async addItem(item) {
-        // Não precisamos mandar o 'id' pois o Supabase gera (auto-increment ou UUID)
-        const { error } = await supabase.from('inventory').insert([item]);
-        if (error) console.error('Erro ao adicionar:', error);
+    async addOrder(order) {
+        const { error } = await supabase.from('orders').insert([order]);
+        if (error) console.error('Erro ao adicionar pedido:', error);
     }
 
-    async updateItem(id, updates) {
-        const { error } = await supabase.from('inventory').update(updates).eq('id', id);
-        if (error) console.error('Erro ao atualizar:', error);
+    async updateStatus(id, newStatus) {
+        const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
+        if (error) console.error('Erro ao atualizar status:', error);
     }
 
-    async deleteItem(id) {
-        const { error } = await supabase.from('inventory').delete().eq('id', id);
-        if (error) console.error('Erro ao deletar:', error);
+    async deleteOrder(id) {
+        const { error } = await supabase.from('orders').delete().eq('id', id);
+        if (error) console.error('Erro ao deletar pedido:', error);
     }
 }
 
-// Para evitar erro no carregamento inicial antes de configurar a chave
-if (SUPABASE_URL === 'COLE_AQUI_A_SUA_PROJECT_URL') {
+if (!SUPABASE_URL || SUPABASE_URL.includes('COLE_AQUI')) {
     console.warn("ATENÇÃO: Você precisa colocar a URL e a KEY no db.js!");
 }
 
-window.db = new RealTimeDB();
+window.db = new OrderDB();
