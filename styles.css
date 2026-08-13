@@ -5,7 +5,7 @@
     --text-primary: #ffffff;
     --text-secondary: #a1a1aa;
     
-    /* Unifique Palette */
+    /* Unifique Palette (Original) */
     --unifique-navy: #25287f;
     --unifique-blue: #00afee;
     --unifique-teal: #42bfc3;
@@ -14,10 +14,15 @@
     --accent: var(--unifique-blue); 
     --accent-hover: #0095cc;
     
-    /* Status Colors mapped to Brand */
-    --status-pedido: var(--unifique-teal);
-    --status-separacao: var(--unifique-blue);
-    --status-disponivel: var(--unifique-lime);
+    /* Status Colors (Customizadas pelo usuário) */
+    --status-pedido: #039dc4;
+    --status-pedido-rgb: 3, 157, 196;
+    
+    --status-separacao: #b9d80a;
+    --status-separacao-rgb: 185, 216, 10;
+    
+    --status-disponivel: #0c9407;
+    --status-disponivel-rgb: 12, 148, 7;
     
     --danger: #ef4444;
 }
@@ -158,9 +163,9 @@ body::before {
 .order-card.status-separacao { border-left-color: var(--status-separacao); }
 .order-card.status-disponivel { 
     border-left-color: var(--status-disponivel); 
-    background: rgba(229, 238, 62, 0.05); /* Lime tint */
+    background: rgba(var(--status-disponivel-rgb), 0.1); /* Fundo com a cor correta */
     border: 2px solid var(--status-disponivel);
-    box-shadow: 0 0 20px rgba(229, 238, 62, 0.1);
+    box-shadow: 0 0 20px rgba(var(--status-disponivel-rgb), 0.2);
     color: #ffffff;
 }
 
@@ -245,9 +250,9 @@ th { text-align: left; padding: 16px; color: var(--text-secondary); font-weight:
 td { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 1.1rem; }
 
 .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
-.badge.pedido { background: rgba(4, 128, 25, 0.2); color: var(--status-pedido); }
-.badge.separacao { background: rgba(0, 175, 238, 0.2); color: var(--status-separacao); }
-.badge.disponivel { background: rgba(0, 255, 21, 0.2); color: var(--status-disponivel); }
+.badge.pedido { background: rgba(var(--status-pedido-rgb), 0.2); color: var(--status-pedido); }
+.badge.separacao { background: rgba(var(--status-separacao-rgb), 0.2); color: var(--status-separacao); }
+.badge.disponivel { background: rgba(var(--status-disponivel-rgb), 0.2); color: var(--status-disponivel); }
 
 /* Animations */
 @keyframes slideIn {
@@ -256,9 +261,9 @@ td { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-siz
 }
 
 @keyframes pulse-success {
-    0% { box-shadow: 0 0 0 0 rgba(229, 238, 62, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(229, 238, 62, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(229, 238, 62, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(var(--status-disponivel-rgb), 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(var(--status-disponivel-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--status-disponivel-rgb), 0); }
 }
 
 .pulse-available {

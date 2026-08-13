@@ -5,8 +5,8 @@ function renderTV(container) {
         <div class="tv-layout fade-in">
             <div class="tv-header">
                 <div class="unifique-logo-text">
-                    <!-- Ícone Placeholder para a Logo -->
-                    <svg xmlns="https://i.ibb.co/99gZK6jz/image.png" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <!-- Logo da Unifique -->
+                    <img src="https://i.ibb.co/99gZK6jz/image.png" alt="Unifique Logo" width="40" height="40" style="object-fit: contain; border-radius: 4px;">
                     UNIFIQUE | Retirada de Materiais
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
@@ -29,7 +29,7 @@ function renderTV(container) {
                 </div>
 
                 <!-- Coluna 3: Disponível -->
-                <div class="kanban-col glass" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.3);">
+                <div class="kanban-col glass">
                     <div class="kanban-header header-disponivel">RETIRADA LIBERADA</div>
                     <div class="kanban-cards" id="col-disponivel"></div>
                 </div>
