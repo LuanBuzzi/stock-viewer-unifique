@@ -1,46 +1,64 @@
-// Mock Real-time Database using LocalStorage & BroadcastChannel
+// Configuração do Supabase
+// Substitua pelas suas credenciais corretas!
+const SUPABASE_URL = 'COLE_AQUI_A_SUA_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'COLE_AQUI_A_SUA_ANON_KEY';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 class RealTimeDB {
     constructor() {
-        this.channel = new BroadcastChannel('telecom_inventory_sync');
         this.listeners = [];
-        this.items = this.loadItems();
+        this.items = [];
+        
+        // Carrega dados iniciais
+        this.fetchItems();
 
-        this.channel.onmessage = (event) => {
-            if (event.data.type === 'SYNC') {
-                this.items = event.data.payload;
-                this.notify();
-            }
-        };
+        // Inscreve-se nas mudanças em tempo real
+        this.setupRealtimeSubscription();
     }
 
-    loadItems() {
-        const stored = localStorage.getItem('inventory_items');
-        if (stored) {
-            return JSON.parse(stored);
+    async fetchItems() {
+        const { data, error } = await supabase
+            .from('inventory')
+            .select('*')
+            .order('name', { ascending: true });
+
+        if (error) {
+            console.error('Erro ao buscar dados:', error);
+            return;
         }
-        // Default mock data
-        const defaultData = [
-            { id: 1, name: 'Roteador Wi-Fi 6', category: 'Equipamento', quantity: 45, minQuantity: 10, updatedBy: 'Admin' },
-            { id: 2, name: 'Cabo de Fibra Óptica (m)', category: 'Cabeamento', quantity: 1200, minQuantity: 500, updatedBy: 'Admin' },
-            { id: 3, name: 'Modem ONT GPON', category: 'Equipamento', quantity: 5, minQuantity: 20, updatedBy: 'Admin' },
-            { id: 4, name: 'Conector APC', category: 'Acessório', quantity: 300, minQuantity: 100, updatedBy: 'Admin' }
-        ];
-        this.saveItems(defaultData, false);
-        return defaultData;
+
+        this.items = data || [];
+        this.notify();
     }
 
-    saveItems(data, sync = true) {
-        localStorage.setItem('inventory_items', JSON.stringify(data));
-        this.items = data;
-        if (sync) {
-            this.channel.postMessage({ type: 'SYNC', payload: this.items });
-            this.notify();
+    setupRealtimeSubscription() {
+        supabase
+            .channel('public:inventory')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, payload => {
+                console.log('Mudança Real-time recebida!', payload);
+                this.handleRealtimePayload(payload);
+            })
+            .subscribe();
+    }
+
+    handleRealtimePayload(payload) {
+        if (payload.eventType === 'INSERT') {
+            this.items.push(payload.new);
+        } else if (payload.eventType === 'UPDATE') {
+            this.items = this.items.map(item => item.id === payload.new.id ? payload.new : item);
+        } else if (payload.eventType === 'DELETE') {
+            this.items = this.items.filter(item => item.id !== payload.old.id);
         }
+        
+        // Reordenar por nome
+        this.items.sort((a, b) => a.name.localeCompare(b.name));
+        this.notify();
     }
 
     subscribe(callback) {
         this.listeners.push(callback);
-        callback(this.items); // initial call
+        callback(this.items); // chamada inicial
         return () => {
             this.listeners = this.listeners.filter(l => l !== callback);
         };
@@ -50,21 +68,26 @@ class RealTimeDB {
         this.listeners.forEach(cb => cb(this.items));
     }
 
-    addItem(item) {
-        item.id = Date.now();
-        const newItems = [...this.items, item];
-        this.saveItems(newItems);
+    async addItem(item) {
+        // Não precisamos mandar o 'id' pois o Supabase gera (auto-increment ou UUID)
+        const { error } = await supabase.from('inventory').insert([item]);
+        if (error) console.error('Erro ao adicionar:', error);
     }
 
-    updateItem(id, updates) {
-        const newItems = this.items.map(i => i.id === id ? { ...i, ...updates } : i);
-        this.saveItems(newItems);
+    async updateItem(id, updates) {
+        const { error } = await supabase.from('inventory').update(updates).eq('id', id);
+        if (error) console.error('Erro ao atualizar:', error);
     }
 
-    deleteItem(id) {
-        const newItems = this.items.filter(i => i.id !== id);
-        this.saveItems(newItems);
+    async deleteItem(id) {
+        const { error } = await supabase.from('inventory').delete().eq('id', id);
+        if (error) console.error('Erro ao deletar:', error);
     }
+}
+
+// Para evitar erro no carregamento inicial antes de configurar a chave
+if (SUPABASE_URL === 'COLE_AQUI_A_SUA_PROJECT_URL') {
+    console.warn("ATENÇÃO: Você precisa colocar a URL e a KEY no db.js!");
 }
 
 window.db = new RealTimeDB();
