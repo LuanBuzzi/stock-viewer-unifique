@@ -77,7 +77,38 @@ function renderTV(container) {
         colDisponivel.innerHTML = orders.filter(o => o.status === 'disponivel').map(renderCard).join('');
     });
 
+    // Efeito de auto-scroll lento para colunas com muitos pedidos
+    const autoScrollInterval = setInterval(() => {
+        const cols = document.querySelectorAll('.kanban-cards');
+        cols.forEach(col => {
+            // Só faz scroll se o conteúdo for maior que a tela
+            if (col.scrollHeight > col.clientHeight) {
+                if (!col.dataset.scrollDir) {
+                    col.dataset.scrollDir = "1"; // 1 para descer, -1 para subir
+                }
+                
+                let dir = parseInt(col.dataset.scrollDir);
+                col.scrollTop += dir;
+                
+                // Chegou no final (ou muito próximo) - sobe
+                if (Math.ceil(col.scrollTop + col.clientHeight) >= col.scrollHeight) {
+                    col.dataset.scrollDir = "-1";
+                } 
+                // Chegou no topo - desce
+                else if (col.scrollTop <= 0) {
+                    col.dataset.scrollDir = "1";
+                }
+            } else {
+                // Se não precisa de scroll, garante que está no topo
+                col.scrollTop = 0;
+                col.dataset.scrollDir = "1";
+            }
+        });
+    }, 40); // Ajuste este valor para controlar a velocidade do scroll
+
     return () => {
         if (unsubscribe) unsubscribe();
+        if (intervalId) clearInterval(intervalId);
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
     };
 }
