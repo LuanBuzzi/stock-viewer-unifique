@@ -93,9 +93,17 @@ function renderTV(container) {
         const orderNum = String(order.id).padStart(4, '0');
         const extraClass = order.status === 'disponivel' ? 'pulse-available' : '';
         
+        let tagClass = 'tag-manutencao';
+        if (order.tag === 'REDES') tagClass = 'tag-redes';
+        if (order.tag === 'TERCEIRIZADA') tagClass = 'tag-terceirizada';
+        const tagHtml = order.tag ? `<span class="tag-badge ${tagClass}" style="float: right; font-size: 0.75rem; padding: 4px 8px;">${order.tag}</span>` : '';
+
         return `
             <div class="order-card status-${order.status} ${extraClass}">
-                <div class="order-id">Pedido #${orderNum}</div>
+                <div class="order-id">
+                    Pedido #${orderNum}
+                    ${tagHtml}
+                </div>
                 <div class="order-name">${order.employee}</div>
                 ${order.description ? `<div class="order-desc">${order.description}</div>` : ''}
             </div>

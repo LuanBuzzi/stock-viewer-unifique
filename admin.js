@@ -23,10 +23,22 @@ function renderAdmin(container) {
                             <label>Nome do Colaborador</label>
                             <input type="text" id="order-employee" class="form-control" required placeholder="Ex: Luan Fernandes">
                         </div>
+                        <div class="form-group">
+                            <label>Tipo do Pedido (Tag)</label>
+                            <select id="order-tag" class="form-control" required>
+                                <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+                                <option value="REDES">REDES</option>
+                                <option value="TERCEIRIZADA">TERCEIRIZADA</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Descrição dos Materiais (Opcional)</label>
                         <input type="text" id="order-desc" class="form-control" placeholder="Ex: 2x Roteador, 50m Cabo">
+                    </div>
+                    <div class="form-group">
+                        <label>Anexar Nota Fiscal (Opcional, mantida por 30 dias)</label>
+                        <input type="file" id="order-nf" class="form-control" accept="image/*,application/pdf">
                     </div>
                     <div style="display: flex; gap: 12px; margin-top: 16px;">
                         <button type="submit" class="btn">Adicionar Pedido</button>
@@ -41,6 +53,7 @@ function renderAdmin(container) {
                         <tr>
                             <th>Nº</th>
                             <th>Colaborador</th>
+                            <th>Tag</th>
                             <th>Materiais</th>
                             <th>Data</th>
                             <th>Status Atual</th>
@@ -72,18 +85,29 @@ function renderAdmin(container) {
         formContainer.style.display = 'none';
     });
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Enviando...';
+
         const order = {
             employee: document.getElementById('order-employee').value,
+            tag: document.getElementById('order-tag').value,
             description: document.getElementById('order-desc').value,
             status: 'pedido'
         };
 
-        window.db.addOrder(order);
+        const nfInput = document.getElementById('order-nf');
+        const file = nfInput.files.length > 0 ? nfInput.files[0] : null;
+
+        await window.db.addOrder(order, file);
+        
         formContainer.style.display = 'none';
         form.reset();
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Adicionar Pedido';
     });
 
     window.updateStatus = (id, status) => {
@@ -91,7 +115,7 @@ function renderAdmin(container) {
     };
 
     window.deleteOrder = (id) => {
-        if(confirm('Tem certeza que deseja remover este pedido do painel?')) {
+        if(confirm('Tem certeza que deseja remover este pedido do painel? A NF vinculada será deletada.')) {
             window.db.deleteOrder(id);
         }
     };
@@ -113,21 +137,34 @@ function renderAdmin(container) {
                 actionButtons = `<button class="btn btn-small btn-outline" style="color: var(--text-secondary); border-color: var(--text-secondary)" onclick="deleteOrder(${order.id})">Baixar/Finalizar</button>`;
             }
 
+            let nfLink = '';
+            if (order.nf_path) {
+                const url = window.db.getNFUrl(order.nf_path);
+                nfLink = `<a href="${url}" target="_blank" class="btn btn-small btn-outline" style="color: var(--unifique-blue); border-color: var(--unifique-blue); margin-right: 8px;" title="Baixar NF">📄 NF</a>`;
+            }
+            
+            let tagClass = 'tag-manutencao';
+            if (order.tag === 'REDES') tagClass = 'tag-redes';
+            if (order.tag === 'TERCEIRIZADA') tagClass = 'tag-terceirizada';
+
             return `
             <tr>
                 <td style="color: var(--text-secondary);">#${orderNum}</td>
                 <td style="font-weight: 700; font-size: 1.2rem;">${order.employee}</td>
+                <td><span class="tag-badge ${tagClass}">${order.tag || 'MANUTENÇÃO'}</span></td>
                 <td style="color: var(--text-secondary);">${order.description || '-'}</td>
                 <td style="color: var(--text-secondary);">${dateStr}</td>
                 <td><span class="badge ${order.status}">${order.status.replace('separacao', 'em separação')}</span></td>
                 <td>
-                    <div style="display: flex; gap: 8px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        ${nfLink}
                         ${actionButtons}
                         ${order.status !== 'disponivel' ? `<button class="btn btn-small btn-outline" style="color: var(--danger); border-color: var(--danger)" onclick="deleteOrder(${order.id})" title="Cancelar Pedido">X</button>` : ''}
                     </div>
                 </td>
             </tr>
         `}).join('');
+
     });
 
     return () => {

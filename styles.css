@@ -327,3 +327,31 @@ td { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-siz
     }
 }
 
+/* Tags Styles */
+.tag-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.tag-manutencao {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316; /* Orange */
+    border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.tag-redes {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8; /* Light Blue */
+    border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.tag-terceirizada {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7; /* Purple */
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+

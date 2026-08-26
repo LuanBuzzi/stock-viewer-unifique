@@ -71,7 +71,22 @@ class OrderDB {
         this.listeners.forEach(cb => cb(this.orders));
     }
 
-    async addOrder(order) {
+    async addOrder(order, file = null) {
+        if (file) {
+            try {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const { error: uploadError, data } = await supabaseClient.storage.from('nfs').upload(fileName, file);
+                
+                if (uploadError) throw uploadError;
+                order.nf_path = data.path;
+            } catch (err) {
+                console.error('Erro no upload da NF:', err);
+                alert('Erro ao enviar a Nota Fiscal: ' + err.message);
+                return; // Aborta se falhar o upload
+            }
+        }
+
         const { error } = await supabaseClient.from('orders').insert([order]);
         if (error) {
             console.error('Erro ao adicionar pedido:', error);
@@ -88,11 +103,22 @@ class OrderDB {
     }
 
     async deleteOrder(id) {
+        const order = this.orders.find(o => o.id === id);
+        if (order && order.nf_path) {
+            // Remove o arquivo do Storage antes de apagar a linha
+            await supabaseClient.storage.from('nfs').remove([order.nf_path]);
+        }
+
         const { error } = await supabaseClient.from('orders').delete().eq('id', id);
         if (error) {
             console.error('Erro ao deletar pedido:', error);
             alert('Erro ao deletar: ' + error.message);
         }
+    }
+
+    getNFUrl(path) {
+        const { data } = supabaseClient.storage.from('nfs').getPublicUrl(path);
+        return data.publicUrl;
     }
 }
 
