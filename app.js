@@ -52,6 +52,9 @@ function router() {
     if (hash === '#tv') {
         document.title = "TV - Dashboard de Estoque";
         currentCleanup = renderTV(appContainer);
+    } else if (hash === '#resumo') {
+        document.title = "Resumo - Pedidos e NFs";
+        currentCleanup = renderSummary(appContainer);
     } else if (hash === '#admin') {
         const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
         if (isLoggedIn) {

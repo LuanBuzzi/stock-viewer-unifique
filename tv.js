@@ -10,6 +10,7 @@ function renderTV(container) {
                     UNIFIQUE | Retirada de Materiais
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
+                    <a href="#resumo" title="Resumo e NFs" style="color: rgba(255,255,255,0.3); text-decoration: none; font-size: 1.2rem;">📋</a>
                     <div class="tv-weather" id="tv-weather" style="font-size: 1.6rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                         <span id="weather-icon">--</span>
                         <span id="weather-temp">--°C</span>
@@ -93,10 +94,11 @@ function renderTV(container) {
         const orderNum = String(order.id).padStart(4, '0');
         const extraClass = order.status === 'disponivel' ? 'pulse-available' : '';
         
-        let tagClass = 'tag-manutencao';
-        if (order.tag === 'REDES') tagClass = 'tag-redes';
-        if (order.tag === 'TERCEIRIZADA') tagClass = 'tag-terceirizada';
-        const tagHtml = order.tag ? `<span class="tag-badge ${tagClass}" style="float: right; font-size: 0.75rem; padding: 4px 8px;">${order.tag}</span>` : '';
+        // Cores discretas para a tag
+        let tagColor = '#f97316'; // manutencao
+        if (order.tag === 'REDES') tagColor = '#38bdf8';
+        if (order.tag === 'TERCEIRIZADA') tagColor = '#a855f7';
+        const tagHtml = order.tag ? `<span style="float: right; font-size: 0.7rem; font-weight: normal; color: ${tagColor}; opacity: 0.8; letter-spacing: 0.5px;">• ${order.tag}</span>` : '';
 
         return `
             <div class="order-card status-${order.status} ${extraClass}">
