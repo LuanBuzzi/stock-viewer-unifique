@@ -55,6 +55,9 @@ function router() {
     } else if (hash === '#resumo') {
         document.title = "Resumo - Pedidos e NFs";
         currentCleanup = renderSummary(appContainer);
+    } else if (hash === '#dashboard') {
+        document.title = "Dashboard - Métricas";
+        currentCleanup = renderDashboard(appContainer);
     } else if (hash === '#admin') {
         const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
         if (isLoggedIn) {

@@ -9,6 +9,7 @@ function renderSummary(container) {
                     <p style="color: var(--text-secondary); margin-top: 8px;">Acompanhamento de todos os pedidos e download de NFs.</p>
                 </div>
                 <div style="display: flex; gap: 16px; align-items: center;">
+                    <a href="#dashboard" class="btn btn-outline" style="text-decoration: none; border-color: var(--unifique-blue); color: var(--unifique-blue);">Dashboard</a>
                     <a href="#tv" class="btn btn-outline" style="text-decoration: none;">Voltar para TV</a>
                 </div>
             </div>

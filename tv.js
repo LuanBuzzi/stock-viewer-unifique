@@ -10,7 +10,7 @@ function renderTV(container) {
                     UNIFIQUE | Retirada de Materiais
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
-                    <a href="#resumo" title="Resumo e NFs" style="color: rgba(255,255,255,0.3); text-decoration: none; font-size: 1.2rem;">📋</a>
+                    <a href="#resumo" title="Modo Lista" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.9rem; font-weight: 500; text-transform: uppercase;">Modo Lista</a>
                     <div class="tv-weather" id="tv-weather" style="font-size: 1.6rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                         <span id="weather-icon">--</span>
                         <span id="weather-temp">--°C</span>
